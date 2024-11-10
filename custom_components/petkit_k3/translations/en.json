@@ -1,0 +1,39 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Device is already configured",
+            "cannot_connect": "Failed to connect to device"
+        },
+        "error": {
+            "cannot_connect": "Failed to connect",
+            "invalid_auth": "Invalid authentication",
+            "unknown": "Unexpected error"
+        },
+        "step": {
+            "user": {
+                "data": {
+                    "address": "Device MAC Address"
+                },
+                "description": "Enter the MAC address of your Petkit K3 device",
+                "title": "Setup Petkit K3"
+            }
+        }
+    },
+    "entity": {
+        "switch": {
+            "spray": {
+                "name": "Spray",
+                "state_attributes": {
+                    "last_spray": "Last spray time"
+                }
+            },
+            "light": {
+                "name": "Light",
+                "state_attributes": {
+                    "last_state_change": "Last state change"
+                }
+            }
+        }
+    },
+    "title": "Petkit K3"
+}

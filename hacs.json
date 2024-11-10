@@ -1,0 +1,13 @@
+{
+  "name": "PetKit Smart Spray (K3)",
+  "render_readme": true,
+  "domain": "petkit_k3",
+  "documentation": "https://github.com/sergey-akhmineev/PetKit-Smart-Spray/blob/main/README.md",
+  "issue_tracker": "https://github.com/sergey-akhmineev/PetKit-Smart-Spray/issues",
+  "codeowners": ["@sergey-akhmineev"],
+  "homeassistant": "2024.11.1",
+  "categories": ["device"],
+  "keywords": ["pet", "kit", "bluetooth", "spray", "light"],
+  "requirements": [],
+  "icon": "mdi:cat"
+}
