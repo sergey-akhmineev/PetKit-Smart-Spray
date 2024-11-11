@@ -1,12 +1,14 @@
  {
    "domain": "petkit_k3",
-   "name": "PetKit Smart Spray (K3)",
+   "name": "PetKit Smart Spray",
    "documentation": "https://github.com/sergey-akhmineev/PetKit-Smart-Spray/blob/main/README.md",
+   "issue_tracker": "https://github.com/sergey-akhmineev/PetKit-Smart-Spray/issues",
    "dependencies": ["bluetooth"],
    "codeowners": ["@sergey-akhmineev"],
    "requirements": ["bleak>=0.19.0"],
+   "integration_type": "device",
    "iot_class": "local_polling",
-   "version": "1.0.0",
+   "version": "1.0.1",
    "config_flow": true,
    "icon": "icons/petkit_logo.png"
  }
