@@ -1,4 +1,5 @@
-"""The Petkit K3 integration."""
+# __init__.py
+
 import asyncio
 import logging
 
@@ -11,11 +12,11 @@ from .device import PetkitK3Device
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS: list[str] = ["switch", "button"]
+PLATFORMS: list[str] = ["button"]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Set up Petkit K3 from a config entry."""
+    """Настройка PetKit K3 по конфигурационной записи."""
     device = PetkitK3Device(entry.data["address"])
 
     # Делаем несколько попыток подключения
@@ -39,14 +40,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     # Подписаться на сигнал остановки Home Assistant для отключения устройства
     async def stop_petkit(event):
-        """Stop Petkit device."""
+        """Остановка устройства PetKit."""
         await device.disconnect()
 
     entry.async_on_unload(
         hass.bus.async_listen_once("homeassistant_stop", stop_petkit)
     )
 
-    # Запуск фоновой задачи для поиска устройств
+    # Запуск фоновой задачи для поиска новых устройств
     hass.async_create_task(scan_for_devices(hass))
 
     return True
@@ -69,25 +70,25 @@ async def scan_for_devices(hass: HomeAssistant):
                     _LOGGER.info(f"Обнаружено устройство: {device.name} ({device.address})")
                     # Проверка, уже добавлено ли устройство
                     if not any(
-                            entry.data.get("address") == device.address
-                            for entry in hass.config_entries.async_entries(DOMAIN)
+                        entry.data["address"] == device.address
+                        for entry in hass.config_entries.async_entries(DOMAIN)
                     ):
                         # Запуск мастера настройки для подключения
                         hass.async_create_task(
                             hass.config_entries.flow.async_init(
                                 DOMAIN,
                                 context={"source": "bluetooth"},
-                                data=device,
+                                data={"address": device.address, "name": device.name},
                             )
                         )
         except Exception as e:
             _LOGGER.error(f"Ошибка при сканировании устройств: {e}")
 
-        await asyncio.sleep(15)  # Интервал между сканированием
+        await asyncio.sleep(15)
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Unload a config entry."""
+    """Выгрузка конфигурационной записи."""
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if unload_ok:
         device = hass.data[DOMAIN].pop(entry.entry_id)

@@ -1,18 +1,19 @@
-"""Petkit K3 device control."""
+# device.py
+
 import logging
 import asyncio
 import random
 from bleak import BleakClient, BleakError
 from bleak.exc import BleakDeviceNotFoundError
 
-from .const import CHARACTERISTIC_UUID, CMD_INIT, CMD_AUTH, CMD_SPRAY, CMD_LIGHT_ON, CMD_LIGHT_OFF
+from .const import CHARACTERISTIC_UUID, CMD_INIT, CMD_AUTH, CMD_SPRAY, CMD_LIGHT_ON
 
 _LOGGER = logging.getLogger(__name__)
 
 
 class PetkitK3Device:
     def __init__(self, address):
-        """Initialize the device."""
+        """Инициализация устройства."""
         self.address = address
         self.client = None
         self.connected = False
@@ -20,7 +21,7 @@ class PetkitK3Device:
         self._connect_lock = asyncio.Lock()
 
     async def connect(self):
-        """Connect to the device."""
+        """Подключение к устройству."""
         async with self._connect_lock:
             if self.connected:
                 return True
@@ -40,18 +41,18 @@ class PetkitK3Device:
                 return False
 
     def on_disconnected(self, client):
-        """Handle device disconnection."""
+        """Обработка отключения устройства."""
         _LOGGER.warning(f"Устройство {self.address} отключено")
         self.connected = False
         self.start_reconnect()
 
     def start_reconnect(self):
-        """Start the reconnection task."""
+        """Запуск задачи переподключения."""
         if not self._reconnect_task or self._reconnect_task.done():
             self._reconnect_task = asyncio.create_task(self.reconnect())
 
     async def reconnect(self):
-        """Attempt to reconnect to the device."""
+        """Попытка переподключения к устройству."""
         while not self.connected:
             try:
                 _LOGGER.info(f"Попытка переподключения к {self.address}")
@@ -86,7 +87,7 @@ class PetkitK3Device:
                 await asyncio.sleep(15)
 
     async def disconnect(self):
-        """Disconnect from the device."""
+        """Отключение от устройства."""
         if self._reconnect_task:
             self._reconnect_task.cancel()
             try:
@@ -104,7 +105,7 @@ class PetkitK3Device:
                 self.client = None
 
     async def send_command(self, command):
-        """Send command to device."""
+        """Отправка команды устройству."""
         if not self.connected or not self.client:
             _LOGGER.error("Устройство не подключено")
             return False
@@ -120,28 +121,28 @@ class PetkitK3Device:
             return False
 
     async def initialize(self):
-        """Initialize the device."""
-        await self.send_command(CMD_INIT)
+        """Инициализация устройства."""
+        success_init = await self.send_command(CMD_INIT)
         await asyncio.sleep(0.5)
-        await self.send_command(CMD_AUTH)
+        success_auth = await self.send_command(CMD_AUTH)
+        if success_init and success_auth:
+            _LOGGER.info("Устройство инициализировано")
+        else:
+            _LOGGER.error("Не удалось инициализировать устройство")
 
     async def spray(self):
-        """Activate spray."""
+        """Активация спрея."""
         if not self.connected:
             _LOGGER.warning("Невозможно активировать спрей, устройство не подключено")
             return False
         return await self.send_command(CMD_SPRAY)
 
     async def light_on(self):
-        """Turn on light."""
+        """Включение света на 10 секунд."""
         if not self.connected:
             _LOGGER.warning("Невозможно включить свет, устройство не подключено")
             return False
-        return await self.send_command(CMD_LIGHT_ON)
-
-    async def light_off(self):
-        """Turn off light."""
-        if not self.connected:
-            _LOGGER.warning("Невозможно выключить свет, устройство не подключено")
-            return False
-        return await self.send_command(CMD_LIGHT_OFF)
+        success = await self.send_command(CMD_LIGHT_ON)
+        if success:
+            _LOGGER.info("Свет включен на 10 секунд")
+        return success
