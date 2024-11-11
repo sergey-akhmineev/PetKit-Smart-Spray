@@ -5,21 +5,19 @@ import logging
 from bleak import BleakScanner
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.components import bluetooth
 
 from .const import DOMAIN
 from .device import PetkitK3Device
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS: list[str] = ["button"]
-
+PLATFORMS = ["button"]
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Настройка PetKit K3 по конфигурационной записи."""
     device = PetkitK3Device(entry.data["address"])
 
-    # Делаем несколько попыток подключения
+    # Попытка подключения с несколькими повторными попытками
     for attempt in range(3):
         try:
             connect_success = await device.connect()
@@ -35,10 +33,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][entry.entry_id] = device
 
-    # Подключаем платформы
+    # Подключение платформ
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
-    # Подписаться на сигнал остановки Home Assistant для отключения устройства
+    # Подписка на событие остановки Home Assistant для отключения устройства
     async def stop_petkit(event):
         """Остановка устройства PetKit."""
         await device.disconnect()
@@ -48,18 +46,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     )
 
     # Запуск фоновой задачи для поиска новых устройств
-    hass.async_create_task(scan_for_devices(hass))
+    scan_task = hass.async_create_task(scan_for_devices(hass))
+    hass.data[DOMAIN][f"{entry.entry_id}_scan_task"] = scan_task
 
     return True
 
-
 async def scan_for_devices(hass: HomeAssistant):
-    """Фоновая задача для постоянного сканирования устройств."""
+    """Фоновая задача для поиска новых устройств Petkit."""
+    already_scanned = set()
+
     while True:
         try:
             devices = await BleakScanner.discover(timeout=15.0)
             for device in devices:
-                if device.name and device.name.startswith("Petkit"):
+                if device.name and device.name.startswith("Petkit") and device.address not in already_scanned:
                     _LOGGER.info(f"Обнаружено устройство: {device.name} ({device.address})")
                     # Проверка, уже добавлено ли устройство
                     if not any(
@@ -74,17 +74,27 @@ async def scan_for_devices(hass: HomeAssistant):
                                 data={"address": device.address, "name": device.name},
                             )
                         )
+                    already_scanned.add(device.address)
         except Exception as e:
             _LOGGER.error(f"Ошибка при сканировании устройств: {e}")
 
-        await asyncio.sleep(15)
-
+        await asyncio.sleep(60)  # Увеличение интервала сканирования до 60 секунд
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Выгрузка конфигурационной записи."""
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if unload_ok:
-        device = hass.data[DOMAIN].pop(entry.entry_id)
-        await device.disconnect()
+        device = hass.data[DOMAIN].pop(entry.entry_id, None)
+        if device:
+            await device.disconnect()
+
+        # Отмена фоновой задачи сканирования
+        scan_task = hass.data[DOMAIN].pop(f"{entry.entry_id}_scan_task", None)
+        if scan_task:
+            scan_task.cancel()
+            try:
+                await scan_task
+            except asyncio.CancelledError:
+                _LOGGER.debug("Фоновая задача сканирования отменена.")
 
     return unload_ok
