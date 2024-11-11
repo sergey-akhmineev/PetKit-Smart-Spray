@@ -2,7 +2,7 @@
 
 import asyncio
 import logging
-
+from bleak import BleakScanner
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.components import bluetooth
@@ -57,15 +57,8 @@ async def scan_for_devices(hass: HomeAssistant):
     """Фоновая задача для постоянного сканирования устройств."""
     while True:
         try:
-            scanner = bluetooth.async_get_scanner(hass)
-            if scanner is None:
-                _LOGGER.error("Bluetooth сканер недоступен")
-                await asyncio.sleep(30)
-                continue
-
-            discovered_devices = await scanner.async_discover()
-
-            for device in discovered_devices:
+            devices = await BleakScanner.discover(timeout=15.0)
+            for device in devices:
                 if device.name and device.name.startswith("Petkit"):
                     _LOGGER.info(f"Обнаружено устройство: {device.name} ({device.address})")
                     # Проверка, уже добавлено ли устройство
