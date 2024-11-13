@@ -14,13 +14,13 @@
                 "data": {
                     "address": "MAC-адрес устройства"
                 },
-                "description": "Введите MAC-адрес вашего устройства Petkit K3",
-                "title": "Настройка Petkit K3"
+                "description": "Введите MAC-адрес вашего устройства PetKit Smart Spray",
+                "title": "Настройка PetKit Smart Spray"
             }
         }
     },
     "entity": {
-        "switch": {
+        "button": {
             "spray": {
                 "name": "Распыление",
                 "state_attributes": {
@@ -35,5 +35,5 @@
             }
         }
     },
-    "title": "Petkit K3"
+    "title": "PetKit Smart Spray"
 }
