@@ -1,5 +1,4 @@
-# __init__.py
-
+"""The Petkit K3 integration."""
 import asyncio
 import logging
 
@@ -10,13 +9,10 @@ from homeassistant.components import bluetooth
 from .const import DOMAIN
 from .device import PetkitK3Device
 
-
-logging.getLogger("bleak").setLevel(logging.DEBUG)
-logging.basicConfig(level=logging.DEBUG)
-
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS: list[str] = ["button"]
+PLATFORMS: list[str] = ["switch"]
+
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Petkit K3 from a config entry."""
@@ -55,6 +51,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     return True
 
+
 async def scan_for_devices(hass: HomeAssistant):
     """Фоновая задача для постоянного сканирования устройств."""
     while True:
@@ -87,6 +84,7 @@ async def scan_for_devices(hass: HomeAssistant):
             _LOGGER.error(f"Ошибка при сканировании устройств: {e}")
 
         await asyncio.sleep(15)  # Интервал между сканированием
+
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""

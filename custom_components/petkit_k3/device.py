@@ -1,14 +1,14 @@
-# device.py
-
+"""Petkit K3 device control."""
 import logging
 import asyncio
 import random
 from bleak import BleakClient, BleakError
 from bleak.exc import BleakDeviceNotFoundError
 
-from .const import WRITE_CHARACTERISTIC_UUID, NOTIFY_CHARACTERISTIC_UUID, CMD_INIT, CMD_AUTH, CMD_SPRAY, CMD_LIGHT_ON
+from .const import CHARACTERISTIC_UUID, CMD_INIT, CMD_AUTH, CMD_SPRAY, CMD_LIGHT_ON, CMD_LIGHT_OFF
 
 _LOGGER = logging.getLogger(__name__)
+
 
 class PetkitK3Device:
     def __init__(self, address):
@@ -26,11 +26,12 @@ class PetkitK3Device:
                 return True
 
             try:
-                self.client = BleakClient(self.address, disconnected_callback=self.on_disconnected)
+                self.client = BleakClient(self.address)
                 await self.client.connect(timeout=20)
                 self.connected = True
                 _LOGGER.info(f"Подключено к {self.address}")
                 await self.initialize()
+                self.client.set_disconnected_callback(self.on_disconnected)
                 return True
             except (BleakError, asyncio.TimeoutError) as e:
                 _LOGGER.error(f"Не удалось подключиться: {e}")
@@ -63,11 +64,12 @@ class PetkitK3Device:
                         except Exception:
                             pass
 
-                    self.client = BleakClient(self.address, disconnected_callback=self.on_disconnected)
+                    self.client = BleakClient(self.address)
                     await self.client.connect(timeout=20)
                     self.connected = True
                     _LOGGER.info(f"Переподключено к {self.address}")
                     await self.initialize()
+                    self.client.set_disconnected_callback(self.on_disconnected)
                     break
 
             except BleakDeviceNotFoundError:
@@ -109,13 +111,7 @@ class PetkitK3Device:
 
         try:
             byte_command = bytes.fromhex(command)
-            await self.client.write_gatt_char(
-                WRITE_CHARACTERISTIC_UUID,
-                byte_command,
-                response=True
-            )
-            _LOGGER.debug(f"Команда отправлена: {command}")
-            await asyncio.sleep(0.5)  # Дополнительная задержка
+            await self.client.write_gatt_char(CHARACTERISTIC_UUID, byte_command)
             return True
         except Exception as e:
             _LOGGER.error(f"Не удалось отправить команду: {e}")
@@ -124,25 +120,20 @@ class PetkitK3Device:
             return False
 
     async def initialize(self):
-        """Initialize the device and set up notifications."""
+        """Initialize the device."""
         await self.send_command(CMD_INIT)
         await asyncio.sleep(0.5)
         await self.send_command(CMD_AUTH)
 
-        # Подписка на уведомления
-        try:
-            await self.client.start_notify(NOTIFY_CHARACTERISTIC_UUID, self.notification_handler)
-            _LOGGER.info("Подписка на уведомления установлена")
-        except Exception as e:
-            _LOGGER.error(f"Не удалось подписаться на уведомления: {e}")
+    async def spray_on(self):
+        """Turn on spray."""
+        if not self.connected:
+            _LOGGER.warning("Невозможно активировать спрей, устройство не подключено")
+            return False
+        return await self.send_command(CMD_SPRAY)
 
-    def notification_handler(self, sender, data):
-        """Handle notifications from the device."""
-        _LOGGER.debug(f"Получено уведомление от {sender}: {data}")
-        # Здесь можно добавить обработку полученных данных, если необходимо
-
-    async def spray(self):
-        """Activate spray."""
+    async def spray_off(self):
+        """Turn off spray."""
         if not self.connected:
             _LOGGER.warning("Невозможно активировать спрей, устройство не подключено")
             return False
@@ -154,3 +145,10 @@ class PetkitK3Device:
             _LOGGER.warning("Невозможно включить свет, устройство не подключено")
             return False
         return await self.send_command(CMD_LIGHT_ON)
+
+    async def light_off(self):
+        """Turn off light."""
+        if not self.connected:
+            _LOGGER.warning("Невозможно выключить свет, устройство не подключено")
+            return False
+        return await self.send_command(CMD_LIGHT_OFF)

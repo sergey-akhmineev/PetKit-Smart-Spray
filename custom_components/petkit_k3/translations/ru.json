@@ -20,7 +20,7 @@
         }
     },
     "entity": {
-        "button": {
+        "switch": {
             "spray": {
                 "name": "Распыление",
                 "state_attributes": {
