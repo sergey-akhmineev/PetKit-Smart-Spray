@@ -8,7 +8,7 @@
    "requirements": ["bleak>=0.19.0"],
    "integration_type": "device",
    "iot_class": "local_polling",
-   "version": "1.0.1",
+   "version": "v2.0.2",
    "config_flow": true,
    "icon": "icons/petkit_logo.png"
  }
