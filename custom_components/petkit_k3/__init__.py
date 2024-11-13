@@ -49,7 +49,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     )
 
     # Запуск фоновой задачи для поиска устройств
-    hass.async_create_task(scan_for_devices(hass))
+    hass.loop.create_task(scan_for_devices(hass))
 
     return True
 
