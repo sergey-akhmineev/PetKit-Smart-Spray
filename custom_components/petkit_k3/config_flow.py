@@ -13,6 +13,7 @@ from .const import DOMAIN, DEFAULT_NAME
 
 _LOGGER = logging.getLogger(__name__)
 
+
 class PetkitK3ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Petkit K3."""
 

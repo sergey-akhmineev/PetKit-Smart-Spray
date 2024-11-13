@@ -11,7 +11,7 @@ from .device import PetkitK3Device
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS: list[str] = ["switch"]
+PLATFORMS: list[str] = ["switch", "button"]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
