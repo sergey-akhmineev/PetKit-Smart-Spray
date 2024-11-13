@@ -14,7 +14,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
     device: PetkitK3Device = hass.data[DOMAIN][entry.entry_id]
     buttons = [
         PetkitK3SprayButton(device),
-        PetkitK3LightButton(device)
+        PetkitK3LightOnButton(device)
     ]
     async_add_entities(buttons, True)
 
@@ -36,18 +36,18 @@ class PetkitK3SprayButton(ButtonEntity):
         else:
             _LOGGER.error("Не удалось активировать спрей")
 
-class PetkitK3LightButton(ButtonEntity):
+class PetkitK3LightOnButton(ButtonEntity):
     """Кнопка для включения света на устройстве PetKit K3."""
 
     def __init__(self, device: PetkitK3Device):
-        """Инициализация кнопки света."""
+        """Инициализация кнопки включения света."""
         self._device = device
-        self._attr_name = "Кнопка Света PetKit"
-        self._attr_unique_id = f"{device.address}_light_button"
+        self._attr_name = "Кнопка Включения Света PetKit"
+        self._attr_unique_id = f"{device.address}_light_on"
 
     async def async_press(self, **kwargs):
         """Обработка нажатия кнопки для включения света."""
-        _LOGGER.debug("Нажата кнопка света")
+        _LOGGER.debug("Нажата кнопка включения света")
         success = await self._device.light_on()
         if success:
             _LOGGER.info("Свет включён успешно")
