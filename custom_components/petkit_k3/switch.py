@@ -30,7 +30,7 @@ class PetkitK3Spray(SwitchEntity):
         self._attr_unique_id = f"{device.address}_spray"
         self._attr_is_on = False
 
-    async def async_spray_on(self, **kwargs):
+    async def async_turn_on(self, **kwargs):
         """Handle the button press to on spray."""
         _LOGGER.debug("Спрей включен")
         success = await self._device.spray_on()
@@ -40,7 +40,7 @@ class PetkitK3Spray(SwitchEntity):
         else:
             _LOGGER.error("Не удалось активировать спрей")
 
-    async def async_spray_off(self, **kwargs):
+    async def async_turn_off(self, **kwargs):
         """Handle the button press to off spray."""
         _LOGGER.debug("Спрей выключен")
         success = await self._device.spray_off()
