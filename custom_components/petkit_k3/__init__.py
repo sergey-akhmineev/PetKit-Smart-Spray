@@ -1,3 +1,5 @@
+# __init.py__
+
 """The Petkit K3 integration."""
 import asyncio
 import logging
