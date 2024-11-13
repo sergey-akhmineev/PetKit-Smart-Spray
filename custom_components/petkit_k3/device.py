@@ -5,7 +5,7 @@ import random
 from bleak import BleakClient, BleakError
 from bleak.exc import BleakDeviceNotFoundError
 
-from .const import CHARACTERISTIC_UUID, CMD_INIT, CMD_AUTH, CMD_SPRAY, CMD_LIGHT_ON, CMD_LIGHT_OFF
+from .const import CHARACTERISTIC_UUID, CMD_INIT, CMD_AUTH, CMD_SPRAY, CMD_LIGHT_ON
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -138,10 +138,3 @@ class PetkitK3Device:
             _LOGGER.warning("Невозможно включить свет, устройство не подключено")
             return False
         return await self.send_command(CMD_LIGHT_ON)
-
-    async def light_off(self):
-        """Turn off light."""
-        if not self.connected:
-            _LOGGER.warning("Невозможно выключить свет, устройство не подключено")
-            return False
-        return await self.send_command(CMD_LIGHT_OFF)
