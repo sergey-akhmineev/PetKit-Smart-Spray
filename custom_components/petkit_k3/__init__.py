@@ -10,6 +10,10 @@ from homeassistant.components import bluetooth
 from .const import DOMAIN
 from .device import PetkitK3Device
 
+
+logging.getLogger("bleak").setLevel(logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG)
+
 _LOGGER = logging.getLogger(__name__)
 
 PLATFORMS: list[str] = ["button"]
@@ -61,7 +65,7 @@ async def scan_for_devices(hass: HomeAssistant):
                 await asyncio.sleep(30)
                 continue
 
-            discovered_devices = await scanner.async_discover()
+            discovered_devices = await scanner.discover(timeout=10.0)
 
             for device in discovered_devices:
                 if device.name and device.name.startswith("Petkit"):

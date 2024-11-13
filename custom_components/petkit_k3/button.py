@@ -42,7 +42,7 @@ class PetkitK3LightOnButton(ButtonEntity):
     def __init__(self, device: PetkitK3Device):
         """Инициализация кнопки включения света."""
         self._device = device
-        self._attr_name = "Кнопка Включения Света PetKit"
+        self._attr_name = "Кнопка Света PetKit"
         self._attr_unique_id = f"{device.address}_light_on"
 
     async def async_press(self, **kwargs):
