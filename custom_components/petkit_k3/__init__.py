@@ -77,7 +77,7 @@ async def scan_for_devices(hass: HomeAssistant):
                             hass.config_entries.flow.async_init(
                                 DOMAIN,
                                 context={"source": "bluetooth"},
-                                data={"address": device.address},
+                                data=device,
                             )
                         )
         except Exception as e:
