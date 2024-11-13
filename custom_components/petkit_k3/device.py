@@ -109,7 +109,11 @@ class PetkitK3Device:
 
         try:
             byte_command = bytes.fromhex(command)
-            await self.client.write_gatt_char(WRITE_CHARACTERISTIC_UUID, byte_command, response=False)
+            await self.client.write_gatt_char(
+                WRITE_CHARACTERISTIC_UUID,
+                byte_command,
+                response=True
+            )
             _LOGGER.debug(f"Команда отправлена: {command}")
             await asyncio.sleep(0.5)  # Дополнительная задержка
             return True
