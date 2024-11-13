@@ -1,5 +1,5 @@
 DOMAIN = "petkit_k3"
-DEFAULT_NAME = "Petkit K3"
+DEFAULT_NAME = "PetKit Smart Spray"
 
 # Device characteristics
 CHARACTERISTIC_UUID = "0000aaa2-0000-1000-8000-00805f9b34fb"
