@@ -1,38 +1,39 @@
 # button.py
-
 import logging
 from homeassistant.components.button import ButtonEntity
 from homeassistant.helpers.entity import DeviceInfo
-
-from .const import DOMAIN
-from .device import PetkitK3Device
+from .const import DOMAIN, SPRAY_CMD
 
 _LOGGER = logging.getLogger(__name__)
 
-
-async def async_setup_entry(hass, entry, async_add_entities):
-    """Настройка кнопок для PetKit K3."""
-    device: PetkitK3Device = hass.data[DOMAIN][entry.entry_id]
-    buttons = [
-        PetkitK3SprayButton(device),
-    ]
-    async_add_entities(buttons, True)
-
+async def async_setup_entry(hass, config_entry, async_add_entities):
+    domain_data = hass.data[DOMAIN]
+    entities = []
+    for device_id, device in domain_data.items():
+        entities.append(PetkitK3SprayButton(device_id, device))
+    async_add_entities(entities, update_before_add=True)
 
 class PetkitK3SprayButton(ButtonEntity):
-    """Кнопка для активации спрея на устройстве PetKit K3."""
+    def __init__(self, device_id, device_controller):
+        self._device_id = device_id
+        self._controller = device_controller
+        self._attr_name = f"{device_controller.name} Spray"
+        self._attr_unique_id = f"{device_id}_spray"
 
-    def __init__(self, device: PetkitK3Device):
-        """Инициализация кнопки спрея."""
-        self._device = device
-        self._attr_name = "Кнопка Спрея PetKit"
-        self._attr_unique_id = f"{device.address}_spray"
+    @property
+    def available(self):
+        return self._controller.available
 
-    async def async_press(self, **kwargs):
-        """Обработка нажатия кнопки для активации спрея."""
-        _LOGGER.debug("Нажата кнопка спрея")
-        success = await self._device.spray()
-        if success:
-            _LOGGER.info("Спрей активирован успешно")
-        else:
-            _LOGGER.error("Не удалось активировать спрей")
+    @property
+    def device_info(self) -> DeviceInfo:
+        return DeviceInfo(
+            identifiers={(DOMAIN, self._device_id)},
+            name=self._controller.name,
+            manufacturer="Petkit",
+            model="K3"
+        )
+
+    async def async_press(self):
+        resp = await self._controller.send_command(SPRAY_CMD)
+        if resp != "00":
+            _LOGGER.error(f"Ошибка запуска спрея для {self._controller.mac}")

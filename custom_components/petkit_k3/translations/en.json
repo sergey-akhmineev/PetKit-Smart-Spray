@@ -1,39 +1,19 @@
 {
-    "config": {
-        "abort": {
-            "already_configured": "Device is already configured",
-            "cannot_connect": "Failed to connect to device"
-        },
-        "error": {
-            "cannot_connect": "Failed to connect",
-            "invalid_auth": "Invalid authentication",
-            "unknown": "Unexpected error"
-        },
-        "step": {
-            "user": {
-                "data": {
-                    "address": "Device MAC Address"
-                },
-                "description": "Enter the MAC address of your PetKit Smart Spray device",
-                "title": "Setup PetKit Smart Spray"
-            }
-        }
+  "config": {
+    "step": {
+      "user": {
+        "title": "Petkit K3 Integration",
+        "description": "Enter your Petkit account credentials"
+      },
+      "select_devices": {
+        "title": "Select Devices",
+        "description": "Select the devices to add."
+      }
     },
-    "entity": {
-        "button": {
-            "spray": {
-                "name": "Spray",
-                "state_attributes": {
-                    "last_spray": "Last spray time"
-                }
-            },
-            "light": {
-                "name": "Light",
-                "state_attributes": {
-                    "last_state_change": "Last state change"
-                }
-            }
-        }
-    },
-    "title": "PetKit Smart Spray"
+    "error": {
+      "cannot_connect": "Cannot connect to API",
+      "no_devices": "No devices found",
+      "no_device_selected": "You must select at least one device"
+    }
+  }
 }

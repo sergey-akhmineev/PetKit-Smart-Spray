@@ -6,8 +6,10 @@
   "issue_tracker": "https://github.com/sergey-akhmineev/PetKit-Smart-Spray/issues",
   "codeowners": ["@sergey-akhmineev"],
   "homeassistant": "2024.11.1",
-  "categories": ["device"],
-  "keywords": ["pet", "kit", "bluetooth", "spray", "light"],
-  "requirements": [],
-  "icon": "mdi:cat"
+  "description": "Интеграция для управления устройствами Petkit K3 через Bluetooth",
+  "categories": [
+    "integration"
+  ],
+  "quality_scale": "platinum",
+  "keywords": ["pet", "kit", "bluetooth", "spray", "light"]
 }

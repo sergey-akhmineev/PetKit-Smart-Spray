@@ -1,39 +1,19 @@
 {
-    "config": {
-        "abort": {
-            "already_configured": "Устройство уже настроено",
-            "cannot_connect": "Не удалось подключиться к устройству"
-        },
-        "error": {
-            "cannot_connect": "Не удалось подключиться",
-            "invalid_auth": "Неверная аутентификация",
-            "unknown": "Непредвиденная ошибка"
-        },
-        "step": {
-            "user": {
-                "data": {
-                    "address": "MAC-адрес устройства"
-                },
-                "description": "Введите MAC-адрес вашего устройства PetKit Smart Spray",
-                "title": "Настройка PetKit Smart Spray"
-            }
-        }
+  "config": {
+    "step": {
+      "user": {
+        "title": "Интеграция Petkit K3",
+        "description": "Введите учетные данные вашего Petkit аккаунта"
+      },
+      "select_devices": {
+        "title": "Выбор устройств",
+        "description": "Выберите устройства для добавления."
+      }
     },
-    "entity": {
-        "switch": {
-            "spray": {
-                "name": "Распыление",
-                "state_attributes": {
-                    "last_spray": "Время последнего распыления"
-                }
-            },
-            "light": {
-                "name": "Подсветка",
-                "state_attributes": {
-                    "last_state_change": "Последнее изменение состояния"
-                }
-            }
-        }
-    },
-    "title": "PetKit Smart Spray"
+    "error": {
+      "cannot_connect": "Не удалось подключиться к API",
+      "no_devices": "Устройства не найдены",
+      "no_device_selected": "Необходимо выбрать хотя бы одно устройство"
+    }
+  }
 }

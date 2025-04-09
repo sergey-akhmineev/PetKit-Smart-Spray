@@ -1,14 +1,26 @@
 # const.py
 DOMAIN = "petkit_k3"
-DEFAULT_NAME = "PetKit Smart Spray"
+PLATFORMS = ["light", "button"]
 
-# Device characteristics
-WRITE_CHARACTERISTIC_UUID = "0000aaa2-0000-1000-8000-00805f9b34fb"
-NOTIFY_CHARACTERISTIC_UUID = "0000aaa1-0000-1000-8000-00805f9b34fb"
+DEFAULT_REGION = "FR"
+DEFAULT_TIMEZONE = "Asia/Yekaterinburg"
 
-# Commands
-CMD_INIT = 'fafcfdd501000000fb'
-CMD_AUTH = 'fafcfd560101080000001d7eaf21ed20fb'
-CMD_SPRAY = 'fafcfddc010a02000103fb'
-CMD_LIGHT_ON = 'fafcfddc010b02000203fb'
-CMD_LIGHT_OFF = 'fafcfddc010c02000203fb'
+CONF_USERNAME = "username"
+CONF_PASSWORD = "password"
+CONF_REGION = "region"
+CONF_TIMEZONE = "timezone"
+CONF_DEVICES = "devices"
+
+# Bluetooth-константы
+CHAR_UUID = "0000aaa2-0000-1000-8000-00805f9b34fb"
+INIT_CMD = "fafcfdd501000000fb"
+
+# Команды аутентификации – вставляем секрет между префиксом и суффиксом
+AUTH_CMD_PREFIX = "fafcfd56010108000000"
+AUTH_CMD_SUFFIX = "fb"
+
+# Команды для управления
+SPRAY_CMD = "fafcfddc010a02000103fb"
+LIGHT_CMD = "fafcfddc010b02000203fb"
+
+SCAN_INTERVAL = 60  # период heartbeat в секундах
