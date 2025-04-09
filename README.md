@@ -77,3 +77,5 @@ Service: 0000aaa0-0000-1000-8000-00805f9b34fb
 - Battery level reading
 - Liquid level monitoring
 - Operation of the backlight during spraying
+
+Special thanks to @Jezza34000 for his library, it helped in the development of this integration.
