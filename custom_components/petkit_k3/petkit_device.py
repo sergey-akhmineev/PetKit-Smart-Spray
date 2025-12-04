@@ -5,6 +5,8 @@ import logging
 from bleak import BleakClient
 from bleak.exc import BleakError
 
+from bleak_retry_connector import establish_connection, BleakClientWithServiceCache
+
 # ОБРАТИТЕ ВНИМАНИЕ: добавляем импорт функции ниже,
 # чтобы получать Bluetooth-устройство через Home Assistant
 from homeassistant.components.bluetooth import async_ble_device_from_address
@@ -64,7 +66,7 @@ class PetkitK3Device:
                 self._connect_attempts = 0
 
             # Если уже подключено, сбрасываем счетчики
-            if self.client and self.client.is_connected:
+            if self.client and getattr(self.client, "is_connected", False):
                 self._connect_attempts = 0
                 self._reconnect_delay = 10
                 return True
@@ -86,20 +88,28 @@ class PetkitK3Device:
                     except Exception as e:
                         _LOGGER.debug(f"Ошибка отключения перед повторным подключением: {e}")
 
-                self.client = BleakClient(
+                # Используем bleak_retry_connector для надежного соединения
+                self.client = await establish_connection(
+                    BleakClientWithServiceCache,
                     ble_device,
-                    disconnected_callback=self._handle_disconnect
+                    name=self.name,
+                    disconnected_callback=self._handle_disconnect,
+                    retry_interval=5.0,
+                    max_attempts=5,
+                    loop=self.hass.loop,
+                    timeout=20.0
                 )
-                await self.client.connect(timeout=20.0)
+
                 _LOGGER.info(f"Установлено подключение к {self.mac}")
                 self.available = True
 
                 # Обновление состояния сущностей (пример для кнопки спрея)
+                safe_name = self.name.lower().replace(" ", "_")
                 self.hass.async_create_task(
                     self.hass.services.async_call(
                         "homeassistant",
                         "update_entity",
-                        {"entity_id": f"button.{self.name.lower()}_spray"}
+                        {"entity_id": f"button.{safe_name}_spray"}
                     )
                 )
 
