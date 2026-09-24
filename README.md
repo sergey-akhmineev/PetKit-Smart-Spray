@@ -11,6 +11,15 @@
 - ✨ Распыление (работает 10 секунд, затем автоматически отключается)
 - 💡 Подсветка (включается на 10 секунд, не работает во время распыления)
 
+### 🔋 Энергосбережение:
+Интеграция не держит постоянное Bluetooth-соединение с K3 — именно оно быстро разряжало батарею.
+- Доступность устройства определяется пассивно, по его рекламным пакетам (к устройству при этом не подключаемся).
+- Соединение открывается только для отправки команды, аутентификация выполняется один раз за соединение.
+- После простоя соединение закрывается (по умолчанию через 30 секунд, настраивается в *Настройки → Устройства и службы → PetKit Smart Spray → Настроить*; 0 — отключаться сразу после команды).
+- Нет фонового heartbeat и автоматического переподключения. Слот подключения освобождается, что важно для ESPHome Bluetooth Proxy.
+
+Первая команда после простоя выполняется на 1–3 секунды дольше — это время на подключение.
+
 ### Инициализация устройства:
 Для работы требуется выполнить два этапа:
 1. Инициализация: `fafcfdd501000000fb`
@@ -48,6 +57,15 @@
 Current version supports:
 - ✨ Spray function (operates for 10 seconds, then automatically turns off)
 - 💡 Light function (turns on for 10 seconds, doesn't work during spraying)
+
+### 🔋 Battery saving:
+The integration no longer keeps a permanent Bluetooth connection to the K3, which was what drained the battery.
+- Availability is tracked passively from the device's advertisements (no connection is made).
+- A connection is opened only to send a command; authentication happens once per connection.
+- The connection is closed after an idle period (30 seconds by default, configurable in *Settings → Devices & services → PetKit Smart Spray → Configure*; 0 disconnects right after each command).
+- No background heartbeat and no auto-reconnect. The connection slot is released, which matters for ESPHome Bluetooth proxies.
+
+The first command after an idle period takes 1–3 seconds longer while the connection is established.
 
 ### Device Initialization:
 Two steps are required:
