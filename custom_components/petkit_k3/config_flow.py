@@ -3,9 +3,19 @@ import voluptuous as vol
 import logging
 import aiohttp
 from homeassistant import config_entries
-from homeassistant.const import CONF_USERNAME, CONF_PASSWORD
+from homeassistant.const import CONF_USERNAME
+from homeassistant.core import callback
 from homeassistant.helpers import config_validation as cv
-from .const import DOMAIN, DEFAULT_REGION, DEFAULT_TIMEZONE, CONF_REGION, CONF_TIMEZONE
+from .const import (
+    DOMAIN,
+    DEFAULT_REGION,
+    DEFAULT_TIMEZONE,
+    CONF_REGION,
+    CONF_TIMEZONE,
+    CONF_IDLE_TIMEOUT,
+    DEFAULT_IDLE_TIMEOUT,
+    MAX_IDLE_TIMEOUT,
+)
 
 _LOGGER = logging.getLogger(__name__)
 REGION_OPTIONS = ["FR", "US", "CN"]
@@ -13,6 +23,11 @@ REGION_OPTIONS = ["FR", "US", "CN"]
 
 class PetkitK3ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry):
+        return PetkitK3OptionsFlow(config_entry)
 
     async def async_step_user(self, user_input=None):
         errors = {}
@@ -66,9 +81,9 @@ class PetkitK3ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     errors={"base": "no_device_selected"}
                 )
             selected = [device for device in devices if device["device_id"] in selected_devices]
+            # Пароль от облака не сохраняем: для работы по Bluetooth нужны только MAC и секрет
             config_data = {
                 CONF_USERNAME: api_data["username"],
-                CONF_PASSWORD: api_data["password"],
                 CONF_REGION: api_data["region"],
                 CONF_TIMEZONE: api_data["timezone"],
                 "devices": selected,
@@ -104,6 +119,23 @@ class PetkitK3ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         finally:
             await session.close()
         return devices_list
+
+
+class PetkitK3OptionsFlow(config_entries.OptionsFlow):
+    def __init__(self, config_entry):
+        self._config_entry = config_entry
+
+    async def async_step_init(self, user_input=None):
+        if user_input is not None:
+            return self.async_create_entry(title="", data=user_input)
+
+        idle_timeout = self._config_entry.options.get(CONF_IDLE_TIMEOUT, DEFAULT_IDLE_TIMEOUT)
+        data_schema = vol.Schema({
+            vol.Required(CONF_IDLE_TIMEOUT, default=idle_timeout): vol.All(
+                vol.Coerce(int), vol.Range(min=0, max=MAX_IDLE_TIMEOUT)
+            ),
+        })
+        return self.async_show_form(step_id="init", data_schema=data_schema)
 
 
 CONFIG_FLOW = PetkitK3ConfigFlow

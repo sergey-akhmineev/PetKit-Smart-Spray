@@ -15,5 +15,16 @@
       "no_devices": "No devices found",
       "no_device_selected": "You must select at least one device"
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Bluetooth settings",
+        "description": "To save the K3 battery, the integration connects only to send a command and disconnects after the idle time below. Larger values make repeated commands faster but drain the battery more; 0 disconnects immediately after each command.",
+        "data": {
+          "idle_timeout": "Disconnect after idle, seconds"
+        }
+      }
+    }
   }
 }

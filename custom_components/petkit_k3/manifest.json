@@ -7,11 +7,12 @@
    "codeowners": ["@sergey-akhmineev"],
    "requirements": [
     "bleak",
+    "bleak-retry-connector",
     "aiohttp",
     "pypetkitapi"
    ],
    "integration_type": "device",
   "iot_class": "local_polling",
-   "version": "v3.0.0",
+   "version": "v3.1.0",
    "config_flow": true
  }
